@@ -22,7 +22,7 @@ class ProductCollectionViewCell: UICollectionViewCell {
     // 셀 생성자
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupCollectionView()
+        showCollectionView()
     }
     
     // 스토리보드, Xib 로드를 막는 초기화 선언
@@ -31,22 +31,7 @@ class ProductCollectionViewCell: UICollectionViewCell {
     }
     
     // 셀 구성
-    private func setupCollectionView() {
-        contentView.addSubview(productImageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(idLabel)
-        contentView.addSubview(descriptionLabel)
-        contentView.addSubview(priceLabel)
-        
-        // 제품 이미지 오토레이아웃 설정
-        productImageView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            productImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            productImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            productImageView.heightAnchor.constraint(equalToConstant: 300)
-        ])
-        
+    private func showCollectionView() {        
         productImageView.contentMode = .scaleAspectFit
         //        productImageView.clipsToBounds = true  // 이미지를 Fill로 설정 할 경우 필요 없으면 경계를 넘을 수 있음
         
@@ -60,19 +45,29 @@ class ProductCollectionViewCell: UICollectionViewCell {
         priceLabel.font = UIFont.systemFont(ofSize: 16)
         priceLabel.textColor = .blue
         
-        setupAdditionalConstraints()
+        setupCollectionView()
     }
     
     // 레이블 오토레이아웃 설정
-    private func setupAdditionalConstraints() {
+    private func setupCollectionView() {
         
+        contentView.addSubview(productImageView)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(idLabel)
+        contentView.addSubview(descriptionLabel)
+        contentView.addSubview(priceLabel)
         // 오토레이아웃 설정 전 시스템 자동 위치 변경 비활성
+        productImageView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         idLabel.translatesAutoresizingMaskIntoConstraints = false
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
+            productImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            productImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            productImageView.heightAnchor.constraint(equalToConstant: 300),
             titleLabel.topAnchor.constraint(equalTo: productImageView.bottomAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: productImageView.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),

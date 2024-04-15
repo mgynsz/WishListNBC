@@ -18,6 +18,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "WISH LIST"
+        setupRefreshButton()
+        wishListButton()
         addChildVC()
         setupWishlistButton()
         fetchProducts()
@@ -53,6 +55,48 @@ class ViewController: UIViewController {
         ])
     }
     
+    private func setupRefreshButton() {
+        let refreshImage = UIImage(systemName: "goforward")
+        let refreshButton = UIBarButtonItem(image: refreshImage, style: .plain, target: self, action: #selector(refreshProducts))
+        navigationItem.leftBarButtonItem = refreshButton
+    }
+    
+    @objc private func refreshProducts() {
+        fetchProducts()
+    }
+    
+    @objc private func wishListButton() {
+        let heartImage = UIImage(systemName: "heart")
+        let wishListButton = UIBarButtonItem(image: heartImage, style: .plain, target: self, action: #selector(heartButtonTapped))
+        navigationItem.rightBarButtonItem = wishListButton
+    }
+    
+    @objc private func heartButtonTapped() {
+        // 버튼이 눌렸을 때 실행될 코드 작성
+        // 예를 들어, WishListVC로 이동하는 코드 작성
+        let wishListVC = WishListVC()
+        navigationController?.pushViewController(wishListVC, animated: true)
+    }
+    
+    private func showActivityIndicator() {
+        // 인디케이터를 표시할 UIActivityIndicatorView 생성
+        let activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.center = view.center
+        activityIndicator.startAnimating()
+        // 뷰에 추가하여 표시
+        view.addSubview(activityIndicator)
+    }
+    
+    private func hideActivityIndicator() {
+        // 현재 뷰에 추가된 모든 UIActivityIndicatorView 인스턴스를 찾아 숨김
+        view.subviews.forEach {
+            if let activityIndicator = $0 as? UIActivityIndicatorView {
+                activityIndicator.stopAnimating()
+                activityIndicator.removeFromSuperview()
+            }
+        }
+    }
+    
     @objc private func addToWishlist() {
         guard let productToAdd = selectedProduct else { return }
         addProductToCoreData(model: productToAdd)
@@ -60,15 +104,25 @@ class ViewController: UIViewController {
     }
     
     private func showWishlistModal() {
-        let wishlistVC = WishListVC()
+        // 현재 WishListVC 인스턴스를 가져와 위시리스트를 업데이트하고, 모달로 표시합니다.
+        guard let wishlistVC = navigationController?.viewControllers.first(where: { $0 is WishListVC }) as? WishListVC else { return }
         wishlistVC.wishlist = fetchProductsFromCoreData()
         wishlistVC.onWishlistUpdated = { [weak self] updatedWishlist in
             self?.saveProductsToCoreData(products: updatedWishlist)
         }
-        let navController = UINavigationController(rootViewController: wishlistVC)
-        navController.modalPresentationStyle = .fullScreen
-        present(navController, animated: true)
+        navigationController?.present(wishlistVC, animated: true)
     }
+//    
+//    private func showWishlistModal() {
+//        let wishlistVC = WishListVC()
+//        wishlistVC.wishlist = fetchProductsFromCoreData()
+//        wishlistVC.onWishlistUpdated = { [weak self] updatedWishlist in
+//            self?.saveProductsToCoreData(products: updatedWishlist)
+//        }
+//        let navController = UINavigationController(rootViewController: wishlistVC)
+//        navController.modalPresentationStyle = .fullScreen
+//        present(navController, animated: true)
+//    }
     
     func fetchProductsFromCoreData() -> [Product] {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -91,18 +145,24 @@ class ViewController: UIViewController {
     }
     
     private func fetchProducts() {
+        
+        // 인디케이터 표시
+        showActivityIndicator()
+        
         Task {
             do {
-                let products = try await NetworkManager.shared.getAllProduts()
-                DispatchQueue.main.async {
+                let products = try await NetworkManager.shared.getAllProducts()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     self.productsVC.products = products
                     self.productsVC.collectionView.reloadData()
                     self.productsVC.collectionView.selectItem(at: IndexPath(item: 0, section: 0), animated: true, scrollPosition: .top)
                     self.selectedProduct = self.productsVC.products.first
                     self.wishlistButton.isEnabled = true
+                    self.hideActivityIndicator()
                 }
             } catch {
                 print("Error fetching products: \(error)")
+                self.hideActivityIndicator()
             }
         }
     }
