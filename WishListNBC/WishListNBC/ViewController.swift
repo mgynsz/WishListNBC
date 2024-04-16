@@ -72,23 +72,18 @@ class ViewController: UIViewController {
     }
     
     @objc private func heartButtonTapped() {
-        // 버튼이 눌렸을 때 실행될 코드 작성
-        // 예를 들어, WishListVC로 이동하는 코드 작성
         let wishListVC = WishListVC()
         navigationController?.pushViewController(wishListVC, animated: true)
     }
     
     private func showActivityIndicator() {
-        // 인디케이터를 표시할 UIActivityIndicatorView 생성
         let activityIndicator = UIActivityIndicatorView(style: .large)
         activityIndicator.center = view.center
         activityIndicator.startAnimating()
-        // 뷰에 추가하여 표시
         view.addSubview(activityIndicator)
     }
     
     private func hideActivityIndicator() {
-        // 현재 뷰에 추가된 모든 UIActivityIndicatorView 인스턴스를 찾아 숨김
         view.subviews.forEach {
             if let activityIndicator = $0 as? UIActivityIndicatorView {
                 activityIndicator.stopAnimating()
@@ -100,29 +95,17 @@ class ViewController: UIViewController {
     @objc private func addToWishlist() {
         guard let productToAdd = selectedProduct else { return }
         addProductToCoreData(model: productToAdd)
-        showWishlistModal()
+        showWishlistVC()
     }
     
-    private func showWishlistModal() {
-        // 현재 WishListVC 인스턴스를 가져와 위시리스트를 업데이트하고, 모달로 표시합니다.
-        guard let wishlistVC = navigationController?.viewControllers.first(where: { $0 is WishListVC }) as? WishListVC else { return }
+    private func showWishlistVC() {
+        let wishlistVC = WishListVC()
         wishlistVC.wishlist = fetchProductsFromCoreData()
         wishlistVC.onWishlistUpdated = { [weak self] updatedWishlist in
             self?.saveProductsToCoreData(products: updatedWishlist)
         }
-        navigationController?.present(wishlistVC, animated: true)
+        navigationController?.pushViewController(wishlistVC, animated: true)
     }
-//    
-//    private func showWishlistModal() {
-//        let wishlistVC = WishListVC()
-//        wishlistVC.wishlist = fetchProductsFromCoreData()
-//        wishlistVC.onWishlistUpdated = { [weak self] updatedWishlist in
-//            self?.saveProductsToCoreData(products: updatedWishlist)
-//        }
-//        let navController = UINavigationController(rootViewController: wishlistVC)
-//        navController.modalPresentationStyle = .fullScreen
-//        present(navController, animated: true)
-//    }
     
     func fetchProductsFromCoreData() -> [Product] {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -130,7 +113,7 @@ class ViewController: UIViewController {
         do {
             return try context.fetch(request)
         } catch {
-            print("Error fetching products: \(error)")
+            print("Error fetch products: \(error)")
             return []
         }
     }
@@ -140,13 +123,11 @@ class ViewController: UIViewController {
         do {
             try context.save()
         } catch {
-            print("Error saving context: \(error)")
+            print("Error save context: \(error)")
         }
     }
     
     private func fetchProducts() {
-        
-        // 인디케이터 표시
         showActivityIndicator()
         
         Task {
@@ -161,7 +142,6 @@ class ViewController: UIViewController {
                     self.hideActivityIndicator()
                 }
             } catch {
-                print("Error fetching products: \(error)")
                 self.hideActivityIndicator()
             }
         }

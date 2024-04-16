@@ -54,6 +54,7 @@ class WishListTableViewCell: UITableViewCell {
         contentView.addSubview(quantityLabel)
         contentView.addSubview(stepper)
         
+        // 셀 오토레이아웃 설정
         NSLayoutConstraint.activate([
             thumbnailImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             thumbnailImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
@@ -76,13 +77,14 @@ class WishListTableViewCell: UITableViewCell {
     
     @objc private func stepperValueChanged(_ sender: UIStepper) {
         quantityLabel.text = "Qty: \(Int(sender.value))"
-        // 필요하다면, 델리게이트나 클로저를 통해 뷰 컨트롤러에 변경을 알릴 수 있습니다.
     }
     
-    // UI 생성
+    // 셀 UI 생성
     func configure(with product: Product) {
         titleLabel.text = product.title
         quantityLabel.text = "Qty: \(product.quantity)"
+        
+        // SDWWebImage 비동기적으로 이미지 다운로드
         if let thumbnailURL = product.thumbnail, let url = URL(string: thumbnailURL) {
             thumbnailImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholder"))
         } else {

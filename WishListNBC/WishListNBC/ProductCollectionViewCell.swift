@@ -33,7 +33,6 @@ class ProductCollectionViewCell: UICollectionViewCell {
     // 셀 구성
     private func showCollectionView() {        
         productImageView.contentMode = .scaleAspectFit
-        //        productImageView.clipsToBounds = true  // 이미지를 Fill로 설정 할 경우 필요 없으면 경계를 넘을 수 있음
         
         // 셀 텍스트 관련 설정
         idLabel.font = UIFont.systemFont(ofSize: 11)
@@ -56,6 +55,7 @@ class ProductCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(idLabel)
         contentView.addSubview(descriptionLabel)
         contentView.addSubview(priceLabel)
+        
         // 오토레이아웃 설정 전 시스템 자동 위치 변경 비활성
         productImageView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -68,6 +68,7 @@ class ProductCollectionViewCell: UICollectionViewCell {
             productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             productImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             productImageView.heightAnchor.constraint(equalToConstant: 300),
+            
             titleLabel.topAnchor.constraint(equalTo: productImageView.bottomAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: productImageView.leadingAnchor, constant: 16),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -50),
@@ -89,14 +90,14 @@ class ProductCollectionViewCell: UICollectionViewCell {
         ])
     }
     
-    // 셀 UI 업데이트
+    // 셀 UI 생성
     func configure(with model: Model) {
         titleLabel.text = model.title
         idLabel.text = "ID: \(String(model.id))"
         descriptionLabel.text = model.productDescription
         priceLabel.text = "$\(model.price.formattedWithSeparator)"
         
-        // SDWWebImage 비동기적으로 이미지
+        // SDWWebImage 비동기적으로 이미지 다운로드
         if let urlString = model.thumbnail, let url = URL(string: urlString) {
             productImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholder"))
         } else {

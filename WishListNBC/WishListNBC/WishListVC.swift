@@ -21,7 +21,6 @@ class WishListVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         setupTotalPriceLabel()
         setupTableView()
         fetchProductsFromCoreData()
-        setupNavigationBar()
     }
     
     private func setupTotalPriceLabel() {
@@ -56,27 +55,14 @@ class WishListVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: totalPrice.topAnchor) // 이제 제약조건이 올바르게 작동합니다.
+            tableView.bottomAnchor.constraint(equalTo: totalPrice.topAnchor)
         ])
     }
-    
-    private func setupNavigationBar() {
-//        navigationItem.title = "WISH LIST"
-        let backButton = UIBarButtonItem(title: "< BACK", style: .plain, target: self, action: #selector(backButtonTapped))
-        backButton.tintColor = .black
-        navigationItem.rightBarButtonItem = backButton
-    }
-    
-    @objc func backButtonTapped() {
-        navigationController?.popToRootViewController(animated: true)
-    }
-
-
     
     @objc func stepperValueChanged(_ sender: UIStepper) {
         let row = Int(sender.tag)
         guard row < wishlist.count else {
-            return  // 인덱스 범위를 벗어난 경우 함수 종료
+            return
         }
         let product = wishlist[row]
         product.quantity = Int16(sender.value)  // 상품 수량 업데이트
@@ -135,15 +121,14 @@ class WishListVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: WishListTableViewCell.identifier, for: indexPath) as? WishListTableViewCell else {
-            fatalError("Unable to dequeue WishListTableViewCell")
+            fatalError("Error: ")
         }
         let product = wishlist[indexPath.row]
         cell.configure(with: product)
-        cell.stepper.tag = indexPath.row  // 스태퍼의 태그를 여기서 설정
+        cell.stepper.tag = indexPath.row
         cell.stepper.addTarget(self, action: #selector(stepperValueChanged(_:)), for: .valueChanged)
         return cell
     }
-    
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
